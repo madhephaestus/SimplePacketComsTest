@@ -7,7 +7,11 @@
  */
 
 // Apply the java-library plugin to add support for Java Library
+plugins {
+  id "com.github.johnrengelman.shadow" version "2.0.3"
+}
 apply plugin: 'java-library'
+
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -28,7 +32,11 @@ dependencies {
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
 }
-
+shadowJar {
+   baseName = 'SimplePacketComsTest'
+   classifier = null
+   version = null
+}
 jar {
     manifest {
         attributes 'Main-Class': 'edu.wpi.SimplePacketComsTest'
