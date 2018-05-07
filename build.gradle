@@ -28,7 +28,7 @@ dependencies {
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:21.0'
-    api 'com.neuronrobotics:SimplePacketComsJava:0.0.4'
+    api 'com.neuronrobotics:SimplePacketComsJava:0.0.6'
     
 
     // Use JUnit test framework
