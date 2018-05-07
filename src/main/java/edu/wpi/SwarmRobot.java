@@ -24,44 +24,16 @@ public class SwarmRobot {
 	}
 
 	void writeFloats(int id,double [] values){
-		for(PacketType pt:packets){
-			if(pt.idOfCommand ==id){
-				for(int i=0;i<pt.downstream.length;i++){
-					pt.downstream[i]=(float)values[i];
-				}
-				return;
-			}
-		}
+		udpdevice.writeFloats(id, values);
 	}
 	void writeBytes(int id,byte [] values){
-		for(PacketType pt:packets){
-			if(pt.idOfCommand ==id){
-				for(int i=0;i<pt.downstream.length;i++){
-					pt.downstream[i]=(byte)values[i];
-				}
-				return;
-			}
-		}
+		udpdevice.writeBytes(id, values);
 	}
 	void readFloats(int id,double [] values){
-		for(PacketType pt:packets){
-			if(pt.idOfCommand ==id){
-				for(int i=0;i<pt.downstream.length;i++){
-					values[i]=(double)pt.upstream[i];
-				}
-				return;
-			}
-		}
+		udpdevice.readFloats(id, values);
 	}
 	void readBytes(int id,byte [] values){
-		for(PacketType pt:packets){
-			if(pt.idOfCommand ==id){
-				for(int i=0;i<pt.downstream.length;i++){
-					values[i]=(byte)pt.upstream[i];
-				}
-				return;
-			}
-		}
+		udpdevice.readBytes(id, values);
 	}
 	
 	/**
