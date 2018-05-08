@@ -12,14 +12,25 @@ import edu.wpi.SimplePacketComs.phy.UDPSimplePacketComs;
 
 public class SwarmRobot {
 	UDPSimplePacketComs udpdevice;
-	List<PacketType> packets = Arrays.asList(new FloatPacketType(1871, 64),
-				new FloatPacketType(1936, 64),
-				new BytePacketType(2012, 64));
+	PacketType getStatus = new BytePacketType(2012, 64);
+	PacketType clearFaults = new BytePacketType(1871, 64);
+	PacketType pickOrder = new FloatPacketType(1936, 64);
+	PacketType getLocation = new FloatPacketType(1994, 64);
+	PacketType directDrive = new FloatPacketType(1786, 64);
+
+
+	List<PacketType> packets = Arrays.asList(clearFaults,
+				pickOrder,
+				getStatus,
+				directDrive,
+				getLocation);
 	SwarmRobot(InetAddress add) throws Exception{
 
 		udpdevice = new UDPSimplePacketComs(add);
-		for(PacketType pt:packets)
+		for(PacketType pt:packets) {
+			pt.oneShotMode();
 			udpdevice.addPollingPacket(pt);
+		}
 
 	}
 
@@ -30,7 +41,17 @@ public class SwarmRobot {
 		udpdevice.writeBytes(id, values);
 	}
 	void readFloats(int id,double [] values){
-		udpdevice.readFloats(id, values);
+		for (PacketType pt : packets) {
+			if (FloatPacketType.class.isInstance(pt))
+
+				if (pt.idOfCommand == id) {
+					for (int i = 0; i < pt.upstream.length && i<values.length; i++) {
+						float d =  (float) pt.upstream[i];
+						values[i] = d;
+					}
+					return;
+				}
+		}	
 	}
 	void readBytes(int id,byte [] values){
 		udpdevice.readBytes(id, values);
@@ -51,6 +72,10 @@ public class SwarmRobot {
 	 */
 	public  boolean connectDeviceImp(){
 		return udpdevice.connect();
+	}
+	@Override
+	public String toString() {
+		return udpdevice.getName();
 	}
 
 }

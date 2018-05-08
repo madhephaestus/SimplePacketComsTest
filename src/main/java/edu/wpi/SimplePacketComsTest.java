@@ -39,7 +39,8 @@ public class SimplePacketComsTest {
 		robot.writeBytes(2012, bytes);
 		Thread.sleep(1000);
 
-		robot.disconnectDeviceImp();
+		for(SwarmRobot s:robots)
+			s.disconnectDeviceImp();
 	}
 
 }
