@@ -19,28 +19,24 @@ public class SimplePacketComsTest {
 		for (InetAddress add : addresses) {
 			System.out.println("Got " + add);
 			WarehouseRobot e = new WarehouseRobot(add);
-			e.connectDeviceImp();
+			e.connect();
 			robots.add(e);
 		}
 
 		Thread.sleep(1000);
-		WarehouseRobot robot = robots.get(0);
-		double[] data = new double[15];
-		for (int i = 0; i < 15; i++)
-			data[i] = 0;
-		robot.readFloats(1871, data);
-		robot.readFloats(1936, data);
-		robot.writeFloats(1936, data);
+		for(WarehouseRobot robot:robots) {
+			robot.clearFaults();
+			robot.directDrive(10, 0, 0, 0, 0, 0, 100);
+			robot.pickOrder(0, 0, 0, 1, 100, 200);
+			String status = " Robot status "+robot.getStatus()+", drive status "+robot.getDriveStatus()+", location: "+robot.getLocationData();
+			System.out.println(status);
+			System.out.println(robot.getName());
 
-		byte[] bytes = new byte[60];
-		for (int i = 0; i < 60; i++)
-			bytes[i] = 0;
-		robot.readBytes(2012, bytes);
-		robot.writeBytes(2012, bytes);
+		}
 		Thread.sleep(1000);
 
 		for(WarehouseRobot s:robots)
-			s.disconnectDeviceImp();
+			s.disconnect();
 	}
 
 }
