@@ -10,7 +10,7 @@ import edu.wpi.SimplePacketComs.bytepacket.BytePacketType;
 import edu.wpi.SimplePacketComs.floatpacket.FloatPacketType;
 import edu.wpi.SimplePacketComs.phy.UDPSimplePacketComs;
 
-public class SwarmRobot {
+public class WarehouseRobot {
 	UDPSimplePacketComs udpdevice;
 	PacketType getStatus = new BytePacketType(2012, 64);
 	PacketType clearFaults = new BytePacketType(1871, 64);
@@ -24,13 +24,15 @@ public class SwarmRobot {
 				getStatus,
 				directDrive,
 				getLocation);
-	SwarmRobot(InetAddress add) throws Exception{
+	public WarehouseRobot(InetAddress add) throws Exception{
 
 		udpdevice = new UDPSimplePacketComs(add);
+		pickOrder.oneShotMode();
+		clearFaults.oneShotMode();
 		for(PacketType pt:packets) {
-			pt.oneShotMode();
 			udpdevice.addPollingPacket(pt);
 		}
+		
 
 	}
 
@@ -41,17 +43,7 @@ public class SwarmRobot {
 		udpdevice.writeBytes(id, values);
 	}
 	void readFloats(int id,double [] values){
-		for (PacketType pt : packets) {
-			if (FloatPacketType.class.isInstance(pt))
-
-				if (pt.idOfCommand == id) {
-					for (int i = 0; i < pt.upstream.length && i<values.length; i++) {
-						float d =  (float) pt.upstream[i];
-						values[i] = d;
-					}
-					return;
-				}
-		}	
+		udpdevice.readFloats(id, values);
 	}
 	void readBytes(int id,byte [] values){
 		udpdevice.readBytes(id, values);

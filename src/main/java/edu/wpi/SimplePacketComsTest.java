@@ -10,21 +10,21 @@ public class SimplePacketComsTest {
 	public static void main(String[] args) throws Exception {
 		System.out.println("Starting SimplePacketComs Test");
 
-		HashSet<InetAddress> addresses = UDPSimplePacketComs.getAllAddresses();
+		HashSet<InetAddress> addresses = UDPSimplePacketComs.getAllAddresses("Warehouse-21");
 		if (addresses.size() < 1) {
 			System.out.println("No devices found");
 			return;
 		}
-		ArrayList<SwarmRobot> robots = new ArrayList<>();
+		ArrayList<WarehouseRobot> robots = new ArrayList<>();
 		for (InetAddress add : addresses) {
 			System.out.println("Got " + add);
-			SwarmRobot e = new SwarmRobot(add);
+			WarehouseRobot e = new WarehouseRobot(add);
 			e.connectDeviceImp();
 			robots.add(e);
 		}
 
 		Thread.sleep(1000);
-		SwarmRobot robot = robots.get(0);
+		WarehouseRobot robot = robots.get(0);
 		double[] data = new double[15];
 		for (int i = 0; i < 15; i++)
 			data[i] = 0;
@@ -39,7 +39,7 @@ public class SimplePacketComsTest {
 		robot.writeBytes(2012, bytes);
 		Thread.sleep(1000);
 
-		for(SwarmRobot s:robots)
+		for(WarehouseRobot s:robots)
 			s.disconnectDeviceImp();
 	}
 
