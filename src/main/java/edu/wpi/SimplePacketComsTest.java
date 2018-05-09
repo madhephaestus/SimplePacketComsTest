@@ -17,7 +17,7 @@ public class SimplePacketComsTest {
 		}
 		ArrayList<WarehouseRobot> robots = new ArrayList<>();
 		for (InetAddress add : addresses) {
-			System.out.println("Got " + add);
+			System.out.println("Got " + add.getHostAddress());
 			WarehouseRobot e = new WarehouseRobot(add);
 			e.connect();
 			robots.add(e);
@@ -30,7 +30,7 @@ public class SimplePacketComsTest {
 			robot.pickOrder(0, 0, 0, 1, 100, 200);
 			String status = " Robot status "+robot.getStatus()+", drive status "+robot.getDriveStatus()+", location: "+robot.getLocationData();
 			System.out.println(status);
-			System.out.println(robot.getName());
+			System.out.println(robot.getName()+" name");
 
 		}
 		Thread.sleep(1000);

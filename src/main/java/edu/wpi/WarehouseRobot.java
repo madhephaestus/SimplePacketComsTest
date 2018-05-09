@@ -1,5 +1,5 @@
 package edu.wpi;
-
+import javafx.scene.transform.Affine;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,9 +26,11 @@ public class WarehouseRobot {
 	private double[] locationData = new double[8];
 	private double[] driveData = new double[8];
 	private double[] driveStatus = new double[1];
-	
+	private InetAddress add;
+	private Affine locationAffine = new Affine();
 	public WarehouseRobot(InetAddress add) throws Exception {
 
+		this.add = add;
 		udpdevice = new UDPSimplePacketComs(add);
 		getName.downstream[0]=(byte)'*';// read name
 		for (PacketType pt : Arrays.asList(clearFaults, pickOrder, getStatus, directDrive, getLocation,getName)) {
@@ -45,6 +47,21 @@ public class WarehouseRobot {
 		});
 		udpdevice.addEvent(getLocation.idOfCommand, () -> {
 			udpdevice.readFloats(getLocation.idOfCommand, locationData);
+			double rotationAngleRadians = Math.PI / 180 * locationData[3];// azimuth	
+
+			getLocationAffine().setMxx(Math.cos(rotationAngleRadians));
+			getLocationAffine().setMxy(Math.sin(rotationAngleRadians));
+			getLocationAffine().setMxz(0);
+			getLocationAffine().setMyx(-Math.sin(rotationAngleRadians));
+			getLocationAffine().setMyy(Math.cos(rotationAngleRadians));
+			getLocationAffine().setMyz(0);
+			getLocationAffine().setMzx(0);
+			getLocationAffine().setMzy(0);
+			getLocationAffine().setMzz(1);
+			getLocationAffine().setTx(locationData[0]);
+			getLocationAffine().setTy(locationData[1]);
+			getLocationAffine().setTz(locationData[2]);
+			
 		});
 		pickOrder.oneShotMode();
 		pickOrder.sendOk();// remove the first call here
@@ -113,7 +130,7 @@ public class WarehouseRobot {
 		driveData[4]=deltaElevation;
 		driveData[5]=deltaTilt;
 		driveData[6]=milisecondsTransition;
-		driveData[7]=(double)(Math.round(Math.random()*100000));
+		driveData[7]=(double)(Math.round(Math.random()*100000));// random session value do demarkate delta motion sessions
 
 		udpdevice.writeFloats(directDrive.idOfCommand, driveData);
 		
@@ -125,12 +142,22 @@ public class WarehouseRobot {
 
 
 	public String getName() {
-		return new String(name);
+		return (add.getHostAddress()+"-"+new String(name)).trim();
 	}
 	
 	public void clearFaults() {
 		clearFaults.oneShotMode();
 
+	}
+
+
+	public Affine getLocationAffine() {
+		return locationAffine;
+	}
+
+
+	public void setLocationAffine(Affine locationAffine) {
+		this.locationAffine = locationAffine;
 	}
 
 

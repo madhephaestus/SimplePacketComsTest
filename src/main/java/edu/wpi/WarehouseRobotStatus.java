@@ -41,4 +41,8 @@ public enum WarehouseRobotStatus {
 	public void setValue(byte value) {
 		this.value = value;
 	}
+	public boolean isFault() {
+		return value>5;
+	}
+	
 }
