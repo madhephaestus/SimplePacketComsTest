@@ -3,6 +3,7 @@ import javafx.scene.transform.Affine;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
@@ -26,12 +27,12 @@ public class WarehouseRobot {
 	private double[] locationData = new double[8];
 	private double[] driveData = new double[8];
 	private double[] driveStatus = new double[1];
-	private InetAddress add;
+	private InetAddress address;
 	private Affine locationAffine = new Affine();
-	public WarehouseRobot(InetAddress add) throws Exception {
+	private WarehouseRobot(InetAddress add) throws Exception {
 
-		this.add = add;
-		udpdevice = new UDPSimplePacketComs(add);
+		this.address=add;
+		udpdevice = new UDPSimplePacketComs(address);
 		getName.downstream[0]=(byte)'*';// read name
 		for (PacketType pt : Arrays.asList(clearFaults, pickOrder, getStatus, directDrive, getLocation,getName)) {
 			udpdevice.addPollingPacket(pt);
@@ -71,8 +72,24 @@ public class WarehouseRobot {
 		
 		
 	}
-	
-
+	public static List<WarehouseRobot> get(String name) throws Exception {
+		HashSet<InetAddress> addresses = UDPSimplePacketComs.getAllAddresses(name);
+		ArrayList<WarehouseRobot> robots = new ArrayList<>();
+		if (addresses.size() < 1) {
+			System.out.println("No WarehouseRobot found named "+name);
+			return robots;
+		}
+		for (InetAddress add : addresses) {
+			System.out.println("Got " + add.getHostAddress());
+			WarehouseRobot e = new WarehouseRobot(add);
+			e.connect();
+			robots.add(e);
+		}
+		return robots;
+	}
+	public static List<WarehouseRobot> get() throws Exception {
+		return get("*");
+	}
 	/**
 	 * This method tells the connection object to disconnect its pipes and close out
 	 * the connection. Once this is called, it is safe to remove your device.
@@ -130,7 +147,7 @@ public class WarehouseRobot {
 		driveData[4]=deltaElevation;
 		driveData[5]=deltaTilt;
 		driveData[6]=milisecondsTransition;
-		driveData[7]=(double)(Math.round(Math.random()*100000));// random session value do demarkate delta motion sessions
+		driveData[7]=(double)(Math.round(Math.random()*100000.0));// random session value do demarkate delta motion sessions
 
 		udpdevice.writeFloats(directDrive.idOfCommand, driveData);
 		
@@ -142,7 +159,7 @@ public class WarehouseRobot {
 
 
 	public String getName() {
-		return (add.getHostAddress()+"-"+new String(name)).trim();
+		return (getAddress().getHostAddress()+"-"+new String(name)).trim();
 	}
 	
 	public void clearFaults() {
@@ -159,6 +176,10 @@ public class WarehouseRobot {
 	public void setLocationAffine(Affine locationAffine) {
 		this.locationAffine = locationAffine;
 	}
+	public InetAddress getAddress() {
+		return address;
+	}
+
 
 
 }

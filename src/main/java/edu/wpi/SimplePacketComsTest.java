@@ -4,25 +4,14 @@ import edu.wpi.SimplePacketComs.phy.UDPSimplePacketComs;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 public class SimplePacketComsTest {
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("Starting SimplePacketComs Test");
 
-		HashSet<InetAddress> addresses = UDPSimplePacketComs.getAllAddresses("Warehouse-21");
-		if (addresses.size() < 1) {
-			System.out.println("No devices found");
-			return;
-		}
-		ArrayList<WarehouseRobot> robots = new ArrayList<>();
-		for (InetAddress add : addresses) {
-			System.out.println("Got " + add.getHostAddress());
-			WarehouseRobot e = new WarehouseRobot(add);
-			e.connect();
-			robots.add(e);
-		}
-
+		List<WarehouseRobot> robots = WarehouseRobot.get("Warehouse-21");
 		Thread.sleep(1000);
 		for(WarehouseRobot robot:robots) {
 			robot.clearFaults();
