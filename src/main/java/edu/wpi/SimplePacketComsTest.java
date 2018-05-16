@@ -1,17 +1,16 @@
 package edu.wpi;
 
-import edu.wpi.SimplePacketComs.phy.UDPSimplePacketComs;
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+
+import edu.wpi.SimplePacketComs.device.warehouse.WarehouseRobot;
+
 
 public class SimplePacketComsTest {
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("Starting SimplePacketComs Test");
 
-		List<WarehouseRobot> robots = WarehouseRobot.get("Warehouse-21");
+		List<WarehouseRobot> robots = WarehouseRobot.get();
 		Thread.sleep(1000);
 		for(WarehouseRobot robot:robots) {
 			robot.clearFaults();
@@ -19,7 +18,7 @@ public class SimplePacketComsTest {
 			robot.pickOrder(0, 0, 0, 1, 100, 200);
 			String status = " Robot status "+robot.getStatus()+", drive status "+robot.getDriveStatus()+", location: "+robot.getLocationData();
 			System.out.println(status);
-			System.out.println(robot.getName()+" name");
+			System.out.println("name = "+robot.getName());
 
 		}
 		Thread.sleep(1000);
